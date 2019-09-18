@@ -1,0 +1,35 @@
+<input> 3 2
+
+read 1  ; r1 greater op
+read 2  ; r2 lesser op
+load 1
+sub 2
+jgtz sum_start
+load 2  ; swap r1 and r2 through summation if r1 < r2
+add 1
+store 2
+sub 1
+store 1
+load 2
+sub 1
+store 2
+sum_start:
+load =0  ; initialize sum to 0
+store 3  ; r3 sum accumulator
+load 2
+jz loop_exit
+loop_start:  ; summation loop
+	load 3
+	add 1
+	store 3
+	load 2
+	sub =1
+	store 2
+	jgtz loop_start
+loop_exit:
+write 3
+halt
+	
+	
+		
+	

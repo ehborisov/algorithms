@@ -1,0 +1,60 @@
+<input> 5 5 4 3 2 1
+
+read 0
+store 1
+store 2
+add =3
+store 3
+; read input numbers in the loop storing k-th number in the N+4-k-th register
+read_loop: 
+	load 3
+	read *0
+	sub =1
+	store 3
+	load 2
+	sub =1
+	store 2
+	jgtz read_loop
+load 1
+add =3
+store 2  ; initialize pointer for the outer loop to N+3
+
+outer_loop:
+	load 2
+	sub =1
+	store 3 ; initialize pointer for the inner loop at outer - 1
+	inner_loop:
+		load *3
+		sub *2
+		jgtz swap_not_needed
+		load *3
+		add *2
+		store *3
+		sub *2
+		store *2
+		load *3
+		sub *2
+		store *3
+		swap_not_needed:
+		load 3
+		sub =1
+		store 3
+		sub =3
+		jgtz inner_loop
+	load 2
+	sub =1
+	store 2
+	sub =4
+	jgtz outer_loop
+
+load 1
+add =3
+store 1
+write_loop:
+load 1
+write *0
+sub =1
+store 1
+sub =3
+jgtz write_loop
+halt	

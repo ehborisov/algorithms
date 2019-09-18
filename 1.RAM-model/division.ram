@@ -1,0 +1,40 @@
+<input> 1 9
+
+read 1  ; divident
+read 2  ; divisor
+load =0
+store 3  ; quotient accumulator
+store 4  ; remainder
+load 2
+jz zero_divisor_error
+load 3
+add 4
+loop_start:
+	jz make_subtraction
+	load 3
+	add =1
+	store 3
+	load 1
+	make_subtraction:
+	load 1
+	store 4
+	sub 2
+	store 1
+	jgtz loop_start
+load 2
+sub 4
+jgtz end  ; catch a corner case when dividend = divisor, which is not covered in the loop
+load 3
+add =1
+store 3
+load =0
+store 4
+end:
+write 3
+write 4
+halt		
+zero_divisor_error:
+sub=1
+write 0  ; prints -1 as an erroneous output in the case of zero division
+halt
+	
