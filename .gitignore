@@ -187,3 +187,8 @@ fabric.properties
 .idea/*.iml
 .idea/modules.xml
 .idea/vcs.xml
+.idea/misc.xml
+.idea/compiler.xml
+
+*.iml
+.gradle
