@@ -43,7 +43,9 @@ public class FactorArray<T> implements IArray<T> {
     @Override
     @SuppressWarnings("unchecked")
     public T get(int index) {
-        return (T)array[index];
+        if(index > size -1)
+            throw new IllegalArgumentException("Index is out of the array bounds");
+        return (T) array[index];
     }
 
     private void resize() {
