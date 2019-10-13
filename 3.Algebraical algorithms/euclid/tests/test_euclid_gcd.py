@@ -3,7 +3,7 @@ from euclid import euclid_gcd
 from parameterized import parameterized
 
 
-class MyTestCase(unittest.TestCase):
+class GCDTest(unittest.TestCase):
 
     @parameterized.expand(
         [
