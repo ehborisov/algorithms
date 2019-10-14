@@ -60,18 +60,18 @@ def set_bit(int_type, offset):
 def convert_fen_to_bits(fen_input):
     board = [0] * 12
     figures_mapping = {
-        chess_commons.W_PAWN: 0,
-        chess_commons.W_KNIGHT: 1,
-        chess_commons.W_BISHOP: 2,
-        chess_commons.W_ROOK: 3,
-        chess_commons.W_QUEEN: 4,
-        chess_commons.W_KING: 5,
-        chess_commons.B_PAWN: 6,
-        chess_commons.B_KNIGHT: 7,
-        chess_commons.B_BISHOP: 8,
-        chess_commons.B_ROOK: 9,
-        chess_commons.B_QUEEN: 10,
-        chess_commons.B_KING: 11,
+        chess_commons.Figure.W_PAWN: 0,
+        chess_commons.Figure.W_KNIGHT: 1,
+        chess_commons.Figure.W_BISHOP: 2,
+        chess_commons.Figure.W_ROOK: 3,
+        chess_commons.Figure.W_QUEEN: 4,
+        chess_commons.Figure.W_KING: 5,
+        chess_commons.Figure.B_PAWN: 6,
+        chess_commons.Figure.B_KNIGHT: 7,
+        chess_commons.Figure.B_BISHOP: 8,
+        chess_commons.Figure.B_ROOK: 9,
+        chess_commons.Figure.B_QUEEN: 10,
+        chess_commons.Figure.B_KING: 11,
     }
     lines = fen_input.split('/')
     for j, line in enumerate(reversed(lines)):
@@ -80,8 +80,8 @@ def convert_fen_to_bits(fen_input):
             if c.isdigit():
                 position_in_line += int(c)
             else:
-                figure_index = figures_mapping[c]
-                board[figure_index] = set_bit(board[figure_index], 8*j + position_in_line)
+                figure_index = figures_mapping[chess_commons.Figure(c)]
+                board[figure_index] = set_bit(board[figure_index], 8 * j + position_in_line)
                 position_in_line += 1
     return '\n'.join(str(s) for s in board) + '\n'
 

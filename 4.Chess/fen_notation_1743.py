@@ -34,5 +34,5 @@ if __name__ == "__main__":
             test_input = input_file.read()
         with open(f'{tests_path}/test.{i}.out') as output_file:
             expected_out = output_file.read()
-        out = chess_commons.represent_fen_string(test_input)
+        out = chess_commons.represent_fen_lines(chess_commons.split_fen_string(test_input)[0])
         assert out == expected_out
