@@ -70,7 +70,7 @@ class Position(object):
         self.turn = Turn(turn.lower())
         if castling != EMPTY_DATA:
             for c in castling:
-                self.castling_map[c] = True
+                self.castling_map[Figure(c)] = True
         self.en_passant = tuple(s for s in en_passant) if en_passant != EMPTY_DATA else None
         self.half_moves = int(half_moves)
         self.full_moves = int(full_moves)
@@ -109,7 +109,7 @@ class Position(object):
             # in effect, itertools.groupby just gives an item:iterator[over same items in a row] for item in a sequence
             fen_lines.append(''.join(''.join(e.value for e in elements) if key else str(len(list(elements)))
                                      for key, elements in groupby(line.values())))
-        castling_data = (''.join(sorted(k if v else '' for k, v in self.castling_map.items()))
+        castling_data = (''.join(sorted(k.value if v else '' for k, v in self.castling_map.items()))
                          if any(self.castling_map.values()) else EMPTY_DATA)
         en_passant = ''.join(self.en_passant) if self.en_passant else EMPTY_DATA
         return f"{'/'.join(fen_lines)} {self.turn.value} {castling_data} {en_passant} {self.half_moves}" \
