@@ -95,6 +95,13 @@ DEFAULT_CELLS = {
     Figure.W_ROOK: ((Column.a, 0), (Column.h, 0))
 }
 
+CASTLING_CELLS = {
+    Figure.W_KING: ((Column.c, 0), (Column.g, 0)),
+    Figure.B_KING: ((Column.c, 7), (Column.g, 7)),
+    Figure.B_ROOK: ((Column.d, 7), (Column.f, 7)),
+    Figure.W_ROOK: ((Column.d, 0), (Column.f, 0))
+}
+
 
 EMPTY_SQUARE = '.'
 
@@ -177,7 +184,7 @@ class Position(object):
         lines.reverse()
         return lines
 
-    def _count_move(self, row_from: int, col_from: Column, row_to: int, col_to: Column) -> None:
+    def _count_move(self, col_from: Column, row_from: int, col_to: Column, row_to: int) -> None:
         if self.turn == Turn.BLACKS:
             self.full_moves += 1
             self.turn = Turn.WHITES
@@ -213,11 +220,9 @@ class Position(object):
     def _check_castling(self, removed_figure: Optional[Figure], moved_figure: Figure, col_from: Column, row_from: int,
                         col_to: Column, row_to: int) -> None:
         if moved_figure == Figure.W_KING and (col_from, row_from) == DEFAULT_CELLS[Figure.W_KING]:
-            self.castling_map[Figure.W_KING] = False
-            self.castling_map[Figure.W_QUEEN] = False
+            self._do_castling(col_to, row_to, moved_figure, Figure.W_QUEEN, Figure.W_ROOK)
         elif moved_figure == Figure.B_KING and (col_from, row_from) == DEFAULT_CELLS[Figure.B_KING]:
-            self.castling_map[Figure.B_KING] = False
-            self.castling_map[Figure.B_QUEEN] = False
+            self._do_castling(col_to, row_to, moved_figure, Figure.B_QUEEN, Figure.B_ROOK)
         elif moved_figure == Figure.W_ROOK:
             if (col_from, row_from) == DEFAULT_CELLS[Figure.W_ROOK][0]:
                 self.castling_map[Figure.W_QUEEN] = False
@@ -239,13 +244,20 @@ class Position(object):
             elif (col_to, row_to) == DEFAULT_CELLS[Figure.B_ROOK][1]:
                 self.castling_map[Figure.B_KING] = False
 
+    def _do_castling(self, col_to: Column, row_to: int, king: Figure, queen: Figure, rook: Figure) -> None:
+        if (col_to, row_to) == CASTLING_CELLS[king][0] and self.castling_map[queen]:
+            self._move_figure(*DEFAULT_CELLS[rook][0], *CASTLING_CELLS[rook][0])
+        elif (col_to, row_to) == CASTLING_CELLS[king][1] and self.castling_map[king]:
+            self._move_figure(*DEFAULT_CELLS[rook][1], *CASTLING_CELLS[rook][1])
+        self.castling_map[king] = False
+        self.castling_map[queen] = False
+
     def move(self, cell_from: str, cell_to: str) -> Position:
         row_from, col_from = int(cell_from[1]) - 1, Column(ord(cell_from[0]))
         row_to, col_to = int(cell_to[1]) - 1, Column(ord(cell_to[0]))
         new_position = deepcopy(self)
-        new_position._count_move(row_from, col_from, row_to, col_to)
-        new_position.lines[row_to][col_to] = new_position.lines[row_from][col_from]
-        new_position.lines[row_from][col_from] = None
+        new_position._count_move(col_from, row_from, col_to, row_to)
+        new_position._move_figure(col_from, row_from, col_to, row_to)
         if any(self.castling_map.values()) and (self._at_cell(col_from, row_from) in Figure.rooks() + Figure.kings()
                                                 or self._at_cell(col_to, row_to) in Figure.rooks()):
             new_position._check_castling(self.lines[row_to][col_to], self.lines[row_from][col_from],
@@ -260,6 +272,10 @@ class Position(object):
             # pawn transformation
             new_position.lines[row_to][col_to] = Figure(cell_to[2])
         return new_position
+
+    def _move_figure(self, col_from: Column, row_from: int, col_to: Column, row_to: int) -> None:
+        self.lines[row_to][col_to] = self.lines[row_from][col_from]
+        self.lines[row_from][col_from] = None
 
     def _at_cell(self, col: Column, row: int) -> Optional[Figure]:
         return self.lines[row][col]
