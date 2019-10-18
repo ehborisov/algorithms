@@ -27,6 +27,34 @@ class Figure(Enum):
     B_KNIGHT = 'n'
     B_PAWN = 'p'
 
+    @staticmethod
+    def figures():
+        return set(Figure)
+
+    @staticmethod
+    def pawns():
+        return Figure.W_PAWN, Figure.B_PAWN
+
+    @staticmethod
+    def knights():
+        return Figure.W_KNIGHT, Figure.B_KNIGHT
+
+    @staticmethod
+    def rooks():
+        return Figure.W_ROOK, Figure.B_ROOK
+
+    @staticmethod
+    def bishops():
+        return Figure.W_BISHOP, Figure.B_BISHOP
+
+    @staticmethod
+    def queens():
+        return Figure.W_QUEEN, Figure.B_QUEEN
+
+    @staticmethod
+    def kings():
+        return Figure.W_KING, Figure.B_KING
+
 
 class Column(Enum):
     a = 97
@@ -60,8 +88,15 @@ class Column(Enum):
         return tuple(cls.__members__.keys())
 
 
+DEFAULT_CELLS = {
+    Figure.B_KING: (Column.e, 7),
+    Figure.W_KING: (Column.e, 0),
+    Figure.B_ROOK: ((Column.a, 7), (Column.h, 7)),
+    Figure.W_ROOK: ((Column.a, 0), (Column.h, 0))
+}
+
+
 EMPTY_SQUARE = '.'
-FIGURES = set(Figure)
 
 
 class Turn(Enum):
@@ -149,8 +184,8 @@ class Position(object):
         else:
             self.turn = Turn.BLACKS
         self.half_moves += 1
-        capture = self._at_cell(col_to, row_to) in FIGURES
-        pawn_move = self._at_cell(col_from, row_from) in [Figure.B_PAWN, Figure.W_PAWN]
+        capture = self._at_cell(col_to, row_to) in Figure.figures()
+        pawn_move = self._at_cell(col_from, row_from) in Figure.pawns()
         if pawn_move or capture:
             self.half_moves = 0
 
@@ -168,12 +203,41 @@ class Position(object):
         target_row = row_to - 1 if self._at_cell(col_to, row_to) == Figure.W_PAWN else row_to + 1
         on_the_left = self._at_cell(col_to.left, row_to) if col_to.left else None
         on_the_right = self._at_cell(col_to.right, row_to) if col_to.right else None
-        opposite_pawn_on_the_left = on_the_left in (Figure.W_PAWN, Figure.B_PAWN) and on_the_left != pawn
-        opposite_pawn_on_the_right = on_the_right in (Figure.W_PAWN, Figure.B_PAWN) and on_the_right != pawn
+        opposite_pawn_on_the_left = on_the_left in Figure.pawns() and on_the_left != pawn
+        opposite_pawn_on_the_right = on_the_right in Figure.pawns() and on_the_right != pawn
         if any((opposite_pawn_on_the_left, opposite_pawn_on_the_right)):
             self.en_passant = f"{col_to}{target_row+1}"
         else:
             self.en_passant = None
+
+    def _check_castling(self, removed_figure: Optional[Figure], moved_figure: Figure, col_from: Column, row_from: int,
+                        col_to: Column, row_to: int) -> None:
+        if moved_figure == Figure.W_KING and (col_from, row_from) == DEFAULT_CELLS[Figure.W_KING]:
+            self.castling_map[Figure.W_KING] = False
+            self.castling_map[Figure.W_QUEEN] = False
+        elif moved_figure == Figure.B_KING and (col_from, row_from) == DEFAULT_CELLS[Figure.B_KING]:
+            self.castling_map[Figure.B_KING] = False
+            self.castling_map[Figure.B_QUEEN] = False
+        elif moved_figure == Figure.W_ROOK:
+            if (col_from, row_from) == DEFAULT_CELLS[Figure.W_ROOK][0]:
+                self.castling_map[Figure.W_QUEEN] = False
+            elif (col_from, row_from) == DEFAULT_CELLS[Figure.W_ROOK][1]:
+                self.castling_map[Figure.W_KING] = False
+        elif moved_figure == Figure.B_ROOK:
+            if (col_from, row_from) == DEFAULT_CELLS[Figure.B_ROOK][0]:
+                self.castling_map[Figure.B_QUEEN] = False
+            elif (col_from, row_from) == DEFAULT_CELLS[Figure.B_ROOK][1]:
+                self.castling_map[Figure.B_KING] = False
+        elif removed_figure == Figure.W_ROOK:
+            if (col_to, row_to) == DEFAULT_CELLS[Figure.W_ROOK][0]:
+                self.castling_map[Figure.W_QUEEN] = False
+            elif (col_to, row_to) == DEFAULT_CELLS[Figure.W_ROOK][1]:
+                self.castling_map[Figure.W_KING] = False
+        elif removed_figure == Figure.B_ROOK:
+            if (col_to, row_to) == DEFAULT_CELLS[Figure.B_ROOK][0]:
+                self.castling_map[Figure.B_QUEEN] = False
+            elif (col_to, row_to) == DEFAULT_CELLS[Figure.B_ROOK][1]:
+                self.castling_map[Figure.B_KING] = False
 
     def move(self, cell_from: str, cell_to: str) -> Position:
         row_from, col_from = int(cell_from[1]) - 1, Column(ord(cell_from[0]))
@@ -182,9 +246,13 @@ class Position(object):
         new_position._count_move(row_from, col_from, row_to, col_to)
         new_position.lines[row_to][col_to] = new_position.lines[row_from][col_from]
         new_position.lines[row_from][col_from] = None
+        if any(self.castling_map.values()) and (self._at_cell(col_from, row_from) in Figure.rooks() + Figure.kings()
+                                                or self._at_cell(col_to, row_to) in Figure.rooks()):
+            new_position._check_castling(self.lines[row_to][col_to], self.lines[row_from][col_from],
+                                         col_from, row_from, col_to, row_to)
         if cell_to == self.en_passant:
             new_position._check_en_passant(row_to, col_to)
-        if new_position._at_cell(col_to, row_to) in (Figure.W_PAWN, Figure.B_PAWN) and abs(row_from - row_to) == 2:
+        if new_position._at_cell(col_to, row_to) in Figure.pawns() and abs(row_from - row_to) == 2:
             new_position._set_en_passant(row_to, col_to)
         else:
             new_position.en_passant = None
