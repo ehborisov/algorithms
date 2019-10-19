@@ -239,30 +239,19 @@ class Position(object):
 
     def _check_castling(self, removed_figure: Optional[Figure], moved_figure: Figure, col_from: Column, row_from: int,
                         col_to: Column, row_to: int) -> None:
-        if moved_figure == Figure.W_KING and (col_from, row_from) == DEFAULT_CELLS[Figure.W_KING]:
+        cell_from, cell_to = (col_from, row_from), (col_to, row_to)
+        if moved_figure == Figure.W_KING and cell_from == DEFAULT_CELLS[Figure.W_KING]:
             self._do_castling(col_to, row_to, moved_figure, Figure.W_QUEEN, Figure.W_ROOK)
-        elif moved_figure == Figure.B_KING and (col_from, row_from) == DEFAULT_CELLS[Figure.B_KING]:
+        elif moved_figure == Figure.B_KING and cell_from == DEFAULT_CELLS[Figure.B_KING]:
             self._do_castling(col_to, row_to, moved_figure, Figure.B_QUEEN, Figure.B_ROOK)
-        elif moved_figure == Figure.W_ROOK:
-            if (col_from, row_from) == DEFAULT_CELLS[Figure.W_ROOK][0]:
-                self.castling_map[Figure.W_QUEEN] = False
-            elif (col_from, row_from) == DEFAULT_CELLS[Figure.W_ROOK][1]:
-                self.castling_map[Figure.W_KING] = False
-        elif moved_figure == Figure.B_ROOK:
-            if (col_from, row_from) == DEFAULT_CELLS[Figure.B_ROOK][0]:
-                self.castling_map[Figure.B_QUEEN] = False
-            elif (col_from, row_from) == DEFAULT_CELLS[Figure.B_ROOK][1]:
-                self.castling_map[Figure.B_KING] = False
-        elif removed_figure == Figure.W_ROOK:
-            if (col_to, row_to) == DEFAULT_CELLS[Figure.W_ROOK][0]:
-                self.castling_map[Figure.W_QUEEN] = False
-            elif (col_to, row_to) == DEFAULT_CELLS[Figure.W_ROOK][1]:
-                self.castling_map[Figure.W_KING] = False
-        elif removed_figure == Figure.B_ROOK:
-            if (col_to, row_to) == DEFAULT_CELLS[Figure.B_ROOK][0]:
-                self.castling_map[Figure.B_QUEEN] = False
-            elif (col_to, row_to) == DEFAULT_CELLS[Figure.B_ROOK][1]:
-                self.castling_map[Figure.B_KING] = False
+        for rook, queen, king in ((Figure.W_ROOK, Figure.W_QUEEN, Figure.W_KING),
+                                  (Figure.B_ROOK, Figure.B_QUEEN, Figure.B_KING)):
+            rook_cell = cell_from if rook == moved_figure else cell_to if rook == removed_figure else None
+            if rook_cell:
+                if rook_cell == DEFAULT_CELLS[rook][0]:
+                    self.castling_map[queen] = False
+                elif rook_cell == DEFAULT_CELLS[rook][1]:
+                    self.castling_map[king] = False
 
     def _do_castling(self, col_to: Column, row_to: int, king: Figure, queen: Figure, rook: Figure) -> None:
         if (col_to, row_to) == CASTLING_CELLS[king][0] and self.castling_map[queen]:
