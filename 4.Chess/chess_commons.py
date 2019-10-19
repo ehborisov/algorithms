@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from enum import Enum
-from typing import Optional
+from typing import Optional, List, Tuple
 from itertools import groupby
 
 
@@ -10,6 +10,11 @@ class ChessError(Exception):
     """
     Base exception class for chess utilities.
     """
+
+
+def set_bit(int_type, offset):
+    mask = 1 << offset
+    return int_type | mask
 
 
 class Figure(Enum):
@@ -104,6 +109,7 @@ CASTLING_CELLS = {
 
 
 EMPTY_SQUARE = '.'
+EMPTY_BOARD_FEN = '8/8/8/8/8/8/8/8 w - - 0 0'
 
 
 class Turn(Enum):
@@ -113,6 +119,16 @@ class Turn(Enum):
 
 BORDER_LINE = '  +-----------------+'
 EMPTY_DATA = '-'
+
+
+def get_cell_number(col: Column, row: int) -> int:
+    return 8 * row + col.value - 97
+
+
+def get_cell_for_number(number: int) -> Tuple[Column, int]:
+    row = number // 8
+    col = Column(number % 8 + 97)
+    return col, row
 
 
 def split_fen_string(fen_string, with_end=True):
@@ -298,6 +314,28 @@ class Position(object):
                          if any(self.castling_map.values()) else EMPTY_DATA)
         return f"{'/'.join(fen_lines)} {self.turn.value} {castling_data} {self.en_passant or EMPTY_DATA}" \
                f" {self.half_moves} {self.full_moves}\n"
+
+    def get_cells_for_knight(self, col: Column, row: int) -> List[Tuple[Column, int]]:
+        cells = []
+        horizontal = [Column(col.value + 2) if col.value + 2 <= Column.h.value else None,
+                      Column(col.value - 2) if col.value - 2 >= Column.a.value else None]
+        for c in horizontal:
+            if not c:
+                continue
+            if row < 7 and not self.lines[row + 1][c]:
+                cells.append((c, row + 1))
+            if row > 0 and not self.lines[row - 1][c]:
+                cells.append((c, row - 1))
+        vertical = [row - 2 if row >= 2 else None,
+                    row + 2 if row <= 5 else None]
+        for v in vertical:
+            if v is None:
+                continue
+            if col != Column.h and not self.lines[v][col.right]:
+                cells.append((col.right, v))
+            if col != Column.a and not self.lines[v][col.left]:
+                cells.append((col.left, v))
+        return cells
 
     def __str__(self):
         output_lines = [BORDER_LINE]

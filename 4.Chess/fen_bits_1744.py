@@ -52,11 +52,6 @@ enum Piece
 """
 
 
-def set_bit(int_type, offset):
-    mask = 1 << offset
-    return int_type | mask
-
-
 def convert_fen_to_bits(fen_input):
     board = [0] * 12
     figures_mapping = {
@@ -81,7 +76,7 @@ def convert_fen_to_bits(fen_input):
                 position_in_line += int(c)
             else:
                 figure_index = figures_mapping[chess_commons.Figure(c)]
-                board[figure_index] = set_bit(board[figure_index], 8 * j + position_in_line)
+                board[figure_index] = chess_commons.set_bit(board[figure_index], 8 * j + position_in_line)
                 position_in_line += 1
     return '\n'.join(str(s) for s in board) + '\n'
 
