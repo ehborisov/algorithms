@@ -61,6 +61,10 @@ class Figure(Enum):
         return Figure.W_KING, Figure.B_KING
 
 
+WHITES = (Figure.W_KING, Figure.W_QUEEN, Figure.W_ROOK, Figure.W_BISHOP, Figure.W_KNIGHT, Figure.W_PAWN)
+BLACKS = (Figure.B_KING, Figure.B_QUEEN, Figure.B_ROOK, Figure.B_BISHOP, Figure.B_KNIGHT, Figure.B_PAWN)
+
+
 class Column(Enum):
     a = 97
     b = 98
@@ -133,11 +137,11 @@ def get_cell_for_number(number: int) -> Tuple[Column, int]:
 
 def split_fen_string(fen_string, with_end=True):
     lines = fen_string.split('/')
-    turn = None
-    castling = None
-    en_passant = None
-    half_moves = None
-    full_moves = None
+    turn = 'w'
+    castling = EMPTY_DATA
+    en_passant = EMPTY_DATA
+    half_moves = 0
+    full_moves = 0
     if with_end:
         last_line, turn, castling, en_passant, half_moves, full_moves = lines[-1].split(' ')
         lines[-1] = last_line
@@ -158,14 +162,14 @@ def represent_fen_lines(lines):
 
 class Position(object):
 
-    def __init__(self, fen_input_string):
+    def __init__(self, fen_input_string, with_end=True):
         self.castling_map = {
             Figure.W_KING: False,
             Figure.W_QUEEN: False,
             Figure.B_KING: False,
             Figure.B_QUEEN: False
         }
-        raw_lines, turn, castling, en_passant, half_moves, full_moves = split_fen_string(fen_input_string)
+        raw_lines, turn, castling, en_passant, half_moves, full_moves = split_fen_string(fen_input_string, with_end)
         self.turn = Turn(turn.lower())
         if castling != EMPTY_DATA:
             for c in castling:
@@ -314,6 +318,53 @@ class Position(object):
                          if any(self.castling_map.values()) else EMPTY_DATA)
         return f"{'/'.join(fen_lines)} {self.turn.value} {castling_data} {self.en_passant or EMPTY_DATA}" \
                f" {self.half_moves} {self.full_moves}\n"
+
+    def get_cells_for_rook(self, col: Column, row: int) -> List[Tuple[Column, int]]:
+        cells = []
+        is_white = self._at_cell(col, row) in WHITES
+        for c, to_right in ((col.left, False), (col.right, True)):
+            while c:
+                at_c = self._check_cell(c, row, is_white, cells)
+                if at_c:
+                    break
+                c = c.right if to_right else c.left
+        for r in (range(row + 1, 8), reversed(range(row))):
+            for i in r:
+                at_c = self._check_cell(col, i, is_white, cells)
+                if at_c:
+                    break
+        return cells
+
+    def get_cells_for_bishop(self, col: Column, row: int) -> List[Tuple[Column, int]]:
+        cells = []
+        is_white = self._at_cell(col, row) in WHITES
+        for to_right in (False, True):
+            c = col.right if to_right else col.left
+            r = row + 1
+            while c and r <= 7:
+                at_c = self._check_cell(c, r, is_white, cells)
+                if at_c:
+                    break
+                c = c.right if to_right else c.left
+                r += 1
+            r = row - 1
+            c = col.right if to_right else col.left
+            while c and r >= 0:
+                at_c = self._check_cell(c, r, is_white, cells)
+                if at_c:
+                    break
+                c = c.right if to_right else c.left
+                r -= 1
+        return cells
+
+    def get_cells_for_queen(self, col: Column, row: int) -> List[Tuple[Column, int]]:
+        return self.get_cells_for_rook(col, row) + self.get_cells_for_bishop(col, row)
+
+    def _check_cell(self, col: Column, row: int, is_white: bool, cells: List[Tuple[Column, int]]) -> Optional[Figure]:
+        at_c = self._at_cell(col, row)
+        if not at_c or at_c in (WHITES if not is_white else BLACKS):
+            cells.append((col, row))
+        return at_c
 
     def get_cells_for_knight(self, col: Column, row: int) -> List[Tuple[Column, int]]:
         cells = []
