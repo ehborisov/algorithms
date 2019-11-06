@@ -1,4 +1,4 @@
-5. Sortings
+Sortings
 ===========================
 
 ### 1. Insertion sort and Shell sort
@@ -15,3 +15,12 @@ of pre-ordering and different gap-sequences for Shell sort.
 For the results see `sort_comparison.csv`
 
 TODO: create visualization.
+
+### 2. Heapsort
+
+Module `heapsort/heap.py` contains min and max heap implementations backed by an array. 
+Module `heapsort/heapsort.py` contains heapsort implementation based on the max heap.
+
+to run tests execute `python -m unittest discover -v`
+
+TODO: priority queue, heap element deletion
