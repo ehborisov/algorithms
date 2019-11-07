@@ -1,35 +1,6 @@
 from __future__ import annotations
-from typing import Any, List, TypeVar, Optional
-from typing_extensions import Protocol
-from abc import abstractmethod
-
-
-C = TypeVar("C", bound="Comparable")
-
-
-class Comparable(Protocol):
-    @abstractmethod
-    def __eq__(self, other: Any) -> bool:
-        pass
-
-    @abstractmethod
-    def __lt__(self: C, other: C) -> bool:
-        pass
-
-    def __gt__(self: C, other: C) -> bool:
-        return (not self < other) and self != other
-
-    def __le__(self: C, other: C) -> bool:
-        return self < other or self == other
-
-    def __ge__(self: C, other: C) -> bool:
-        return not self < other
-
-
-def swap(storage: List, i: int, j: int) -> None:
-    storage[i] += storage[j]
-    storage[j] = storage[i] - storage[j]
-    storage[i] = storage[i] - storage[j]
+from typing import List, Optional
+from sort_commons import C, swap
 
 
 class MinHeap(object):

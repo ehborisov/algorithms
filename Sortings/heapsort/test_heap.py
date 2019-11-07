@@ -1,8 +1,7 @@
 import unittest
 import heapq
-import difflib
 
-from random import randint, shuffle
+from random import randint
 from heapsort.heap import MaxHeap, MinHeap
 from copy import copy
 from parameterized import parameterized

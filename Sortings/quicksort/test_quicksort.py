@@ -1,12 +1,12 @@
 import unittest
 
-from heapsort import heapsort
+from quicksort import quicksort
 from random import shuffle
 from copy import copy
 from parameterized import parameterized
 
 
-class HeapsortTest(unittest.TestCase):
+class QuicksortTest(unittest.TestCase):
 
     @parameterized.expand(
         [
@@ -20,11 +20,11 @@ class HeapsortTest(unittest.TestCase):
             [None, 1000],
         ]
     )
-    def test_heapsort(self, _, n):
+    def test_quicksort(self, _, n):
         expected = list(range(n)) if n else []
         shuffled = copy(expected)
         shuffle(shuffled)
-        assert heapsort.heapsort(shuffled) == expected
+        assert quicksort.quicksort(shuffled) == expected
 
 
 if __name__ == '__main__':
