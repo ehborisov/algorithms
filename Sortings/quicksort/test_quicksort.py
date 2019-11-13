@@ -26,6 +26,24 @@ class QuicksortTest(unittest.TestCase):
         shuffle(shuffled)
         assert quicksort.quicksort(shuffled) == expected
 
+    @parameterized.expand(
+        [
+            [None, 0],
+            [None, 1],
+            [None, 2],
+            [None, 3],
+            [None, 5],
+            [None, 10],
+            [None, 17],
+            [None, 1000],
+        ]
+    )
+    def test_quicksort_with_insertion_fallback(self, _, n):
+        expected = list(range(n)) if n else []
+        shuffled = copy(expected)
+        shuffle(shuffled)
+        assert quicksort.quicksort_with_insertion(shuffled) == expected
+
 
 if __name__ == '__main__':
     unittest.main()
