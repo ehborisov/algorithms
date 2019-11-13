@@ -1,5 +1,6 @@
 import timeit
 import csv
+import sys
 from shell_and_insertion_comparison import SHUFFLE_SETUP, SHUFFLED_SETUP, SHUFFLED_5_SETUP, SHUFFLED_10_PERCENT
 from quicksort.quicksort import quicksort
 from quicksort.quicksort import quicksort_with_insertion
@@ -34,7 +35,8 @@ def compare_performance(n):
 
 
 if __name__ == '__main__':
-    n = [20 * (2**k) for k in range(3)]
+    sys.setrecursionlimit(10**6)
+    n = [20 * (2**k) for k in range(10)]
     pool = Pool(4)
     output = pool.map(compare_performance, n)
     with open('quicksort_comparison.csv', 'w', newline='') as csvfile:
