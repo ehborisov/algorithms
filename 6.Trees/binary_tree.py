@@ -48,9 +48,9 @@ class BST(object):
         while True:
             if p.key == x:
                 return p
-            elif p.key < x and p.left:
+            elif p.key > x and p.left:
                 p = p.left
-            elif p.key > x and p.right:
+            elif p.key < x and p.right:
                 p = p.right
             else:
                 return None
@@ -113,13 +113,14 @@ class BST(object):
             values.append(p.key)
             if p and p.right:
                 p = p.right
+            elif not p.parent and not p.left and not p.right:
+                return values
             else:
                 while p.parent.right == p or not p.parent.right:
                     p = p.parent
                     if not p.right:
                         values.append(p.key)
                     if not p.parent:
-                        print(f'returning {values}')
                         return values
                 values.append(p.parent.key)
                 p = p.parent.right
