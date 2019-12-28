@@ -128,6 +128,8 @@ class BST(object):
     def _transplant(self, node_from: Node, node: Node) -> None:
         if node_from.parent is None:
             self.root = node
+            if node:
+                node.parent = None
         elif node_from.parent.left == node_from:
             node_from.parent.left = node
         else:
@@ -151,7 +153,7 @@ class BST(object):
             if p.parent != node:
                 self._transplant(p, p.right)
                 p.right = node.right
-                node.right.parent = p
-                p.left = node.left
-            else:
-                self._transplant(node, node.right)
+                p.right.parent = p
+            self._transplant(node, p)
+            p.left = node.left
+            p.left.parent = p
