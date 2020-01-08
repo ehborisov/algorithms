@@ -84,12 +84,14 @@ if __name__ == '__main__':
     n = [20 * (2**k) for k in range(7)]
     pool = Pool(4)
     output = pool.map(compare_performance, n)
-    with open('simple_bst_comparison.csv', 'w', newline='') as csvfile:
+    with open('trees_comparison.csv', 'w', newline='') as csvfile:
         fieldnames = ['N',
                       'BST_search_ordered', 'BST_search_shuffled',
                       'BST_delete_ordered', 'BST_delete_shuffled',
                       'AVL_search_ordered', 'AVL_search_shuffled',
-                      'AVL_delete_ordered', 'AVL_delete_shuffled']
+                      'AVL_delete_ordered', 'AVL_delete_shuffled',
+                      'RB_search_ordered', 'RB_search_shuffled',
+                      'RB_delete_ordered', 'RB_delete_shuffled']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for res_for_n in output:

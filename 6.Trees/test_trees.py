@@ -1,6 +1,7 @@
 import unittest
 from binary_tree import BST
 from avl_tree import AvlTree
+from red_black_tree import RedBlackTree
 from parameterized import parameterized
 
 
@@ -45,6 +46,12 @@ class BinaryTreeTest(unittest.TestCase):
         inorder = avl.iterative_inorder()
         assert inorder == expected
 
+    @parameterized.expand(BUILD_DATA)
+    def test_build_red_black(self, _, input_data, expected):
+        red_black = RedBlackTree.build_from_list(input_data)
+        inorder = red_black.iterative_inorder()
+        assert inorder == expected
+
     @parameterized.expand(DELETE_DATA)
     def test_delete(self, _, input_data, key):
         bst = BST.build_from_list(input_data)
@@ -73,6 +80,21 @@ class BinaryTreeTest(unittest.TestCase):
         for key in delete_data:
             avl.delete_by_key(key)
         res = avl.iterative_inorder()
+        assert expected_result == res
+
+    @parameterized.expand(DELETE_DATA)
+    def test_delete_in_red_black(self, _, input_data, key):
+        rb = RedBlackTree.build_from_list(input_data)
+        rb.delete_by_key(key)
+        res = set(rb.iterative_inorder())
+        assert key not in res
+
+    @parameterized.expand(DELETE_MULTIPLE_DATA)
+    def test_delete_multiple_red_black(self, _, input_data, delete_data, expected_result):
+        rb = RedBlackTree.build_from_list(input_data)
+        for key in delete_data:
+            rb.delete_by_key(key)
+        res = rb.iterative_inorder()
         assert expected_result == res
 
 
