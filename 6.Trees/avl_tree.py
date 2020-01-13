@@ -130,7 +130,12 @@ class AvlTree(BST):
             return
         while p.parent:
             tmp = p.parent
+            is_left = tmp.left == p
             p = AvlTree._balance(p)
             p.parent = tmp
+            if is_left:
+                tmp.left = p
+            else:
+                tmp.right = p
             p = p.parent
         self.root = p

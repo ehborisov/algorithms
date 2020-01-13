@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from enum import Enum
-from binary_tree import BST, Node
-from typing import Any, List, Union
+from binary_tree import Node
+from typing import Any, List, Union, Optional
 
 
 class Color(Enum):
@@ -31,7 +31,7 @@ class NilNode(object):
         self.color = Color.BLACK
 
 
-class RedBlackTree(BST):
+class RedBlackTree(object):
 
     @classmethod
     def build_from_list(cls, input_list: List) -> RedBlackTree:
@@ -63,9 +63,22 @@ class RedBlackTree(BST):
         return x
 
     def __init__(self):
-        super().__init__()
         self.nil = NilNode()
         self.root = self.nil
+
+    def search(self, x: Any) -> Optional[Any]:
+        if self.root == self.nil:
+            return None
+        p = self.root
+        while True:
+            if p.key == x:
+                return p
+            elif p.key > x and p.left != self.nil:
+                p = p.left
+            elif p.key < x and p.right != self.nil:
+                p = p.right
+            else:
+                return None
 
     def insert(self, key: Any) -> None:
         p1 = self.nil
@@ -148,11 +161,18 @@ class RedBlackTree(BST):
     def _transplant(self, node_from: RedBlackNode, node: Union[RedBlackNode, NilNode]) -> None:
         if node_from.parent == self.nil:
             self.root = node
-        if node_from.parent.left == node_from:
-            node_from.left = node
         else:
-            node_from.right = node
+            if node_from.parent.left == node_from:
+                node_from.parent.left = node
+            else:
+                node_from.parent.right = node
         node.parent = node_from.parent
+
+    def delete_by_key(self, key: Any):
+        node = self.search(key)
+        if not node:
+            raise Exception(f"No such node with key {key}")
+        self.delete(node)
 
     def delete(self, node: RedBlackNode) -> None:
         y = node
@@ -175,7 +195,7 @@ class RedBlackTree(BST):
                 x.parent = y
             self._transplant(node, y)
             y.left = node.left
-            y.left.parent = node.parent
+            y.left.parent = y
             y.color = node.color
         if y_color == Color.BLACK:
             self._rb_delete_fixup(x)
@@ -187,11 +207,11 @@ class RedBlackTree(BST):
                 if s.color == Color.RED:  # case 1
                     s.color = Color.BLACK
                     node.parent.color = Color.RED
-                    tmp = s.parent.parent
-                    is_left = (tmp != self.nil) and (tmp.left == s.parent)
-                    node = RedBlackTree._left_rotation(s.parent)
-                    self._fix_parent_child_links(node, tmp, is_left)
-                    s = node.parent.right
+                    tmp = node.parent.parent
+                    is_left = (tmp != self.nil) and (tmp.left == node.parent)
+                    new_node_parent = RedBlackTree._left_rotation(node.parent)
+                    self._fix_parent_child_links(new_node_parent, tmp, is_left)
+                    s = new_node_parent.right
                 if s.left.color == Color.BLACK and s.right.color == Color.BLACK:  # case 2, s is already black
                     s.color = Color.RED
                     node = node.parent
@@ -209,19 +229,19 @@ class RedBlackTree(BST):
                     s.right.color = Color.BLACK
                     tmp = node.parent.parent
                     is_left = (tmp != self.nil) and (tmp.left == node.parent)
-                    node = RedBlackTree._left_rotation(node.parent)
-                    self._fix_parent_child_links(node, tmp, is_left)
+                    new_node_parent = RedBlackTree._left_rotation(node.parent)
+                    self._fix_parent_child_links(new_node_parent, tmp, is_left)
                     node = self.root
             else:
                 s = node.parent.left
                 if s.color == Color.RED:
                     s.color = Color.BLACK
                     node.parent.color = Color.RED
-                    tmp = s.parent.parent
-                    is_left = (tmp != self.nil) and (tmp.left == s.parent)
-                    node = RedBlackTree._right_rotation(s.parent)
-                    self._fix_parent_child_links(node, tmp, is_left)
-                    s = node.parent.left
+                    tmp = node.parent.parent
+                    is_left = (tmp != self.nil) and (tmp.left == node.parent)
+                    new_node_parent = RedBlackTree._right_rotation(node.parent)
+                    self._fix_parent_child_links(new_node_parent, tmp, is_left)
+                    s = new_node_parent.left
                 if s.right.color == Color.BLACK and s.right.color == Color.BLACK:
                     s.color = Color.RED
                     node = node.parent
@@ -239,13 +259,10 @@ class RedBlackTree(BST):
                     s.left.color = Color.BLACK
                     tmp = node.parent.parent
                     is_left = (tmp != self.nil) and (tmp.left == node.parent)
-                    node = RedBlackTree._right_rotation(node.parent)
-                    self._fix_parent_child_links(node, tmp, is_left)
+                    new_node_parent = RedBlackTree._right_rotation(node.parent)
+                    self._fix_parent_child_links(new_node_parent, tmp, is_left)
                     node = self.root
         node.color = Color.BLACK
-
-
-
 
     def minimum(self, node: Union[RedBlackNode, NilNode]) -> RedBlackNode:
         while (node != self.nil) and (node.left != self.nil):

@@ -77,6 +77,32 @@ for _ in range(n//10):
 ''',
         globals=globals(),
         setup=setup).repeat(4, 10)) for suffix, setup in setups.items()})
+
+    # Red-Black tree built from ordered and randomized data
+    results.update({'RB_search' + suffix: min(timeit.Timer(
+'''
+a = data[:]
+set_of_data = set(data)
+avl = AvlTree.build_from_list(a)
+for _ in range(n//10):
+    rnd = random.sample(set_of_data, 1)[0]
+    avl.search(rnd)
+''',
+        globals=globals(),
+        setup=setup).repeat(4, 10)) for suffix, setup in setups.items()})
+
+    results.update({'RB_delete' + suffix: min(timeit.Timer(
+'''
+a = data[:]
+set_of_data = set(data)
+avl = AvlTree.build_from_list(a)
+for _ in range(n//10):
+    rnd = random.sample(set_of_data, 1)[0]
+    avl.delete_by_key(rnd)
+    set_of_data.remove(rnd)
+''',
+        globals=globals(),
+        setup=setup).repeat(4, 10)) for suffix, setup in setups.items()})
     return results
 
 
