@@ -2,6 +2,7 @@ import unittest
 from binary_tree import BST
 from avl_tree import AvlTree
 from red_black_tree import RedBlackTree
+from b_tree import BTree
 from parameterized import parameterized
 
 
@@ -52,6 +53,12 @@ class BinaryTreeTest(unittest.TestCase):
         inorder = red_black.iterative_inorder()
         assert inorder == expected
 
+    @parameterized.expand(BUILD_DATA)
+    def test_build_b_tree(self, _, input_data, expected):
+        b_tree = BTree.build_from_list(input_data, 2)
+        inorder = b_tree.inorder_walk()
+        assert inorder == expected
+
     @parameterized.expand(DELETE_DATA)
     def test_delete(self, _, input_data, key):
         bst = BST.build_from_list(input_data)
@@ -66,12 +73,27 @@ class BinaryTreeTest(unittest.TestCase):
         res = set(avl.iterative_inorder())
         assert key not in res
 
+    @parameterized.expand(DELETE_DATA)
+    def test_delete_in_b_tree(self, _, input_data, key):
+        b_tree = BTree.build_from_list(input_data, 2)
+        b_tree.delete_by_key(key)
+        res = set(b_tree.inorder_walk())
+        assert key not in res
+
     @parameterized.expand(DELETE_MULTIPLE_DATA)
     def test_delete_multiple_bst(self, _, input_data, delete_data, expected_result):
         bst = BST.build_from_list(input_data)
         for key in delete_data:
             bst.delete_by_key(key)
         res = bst.iterative_inorder()
+        assert expected_result == res
+
+    @parameterized.expand(DELETE_MULTIPLE_DATA)
+    def test_delete_multiple_b_tree(self, _, input_data, delete_data, expected_result):
+        b_tree = BTree.build_from_list(input_data, 2)
+        for key in delete_data:
+            b_tree.delete_by_key(key)
+        res = b_tree.inorder_walk()
         assert expected_result == res
 
     @parameterized.expand(DELETE_MULTIPLE_DATA)

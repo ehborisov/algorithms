@@ -19,6 +19,13 @@ class BNode(object):
 
 class BTree(object):
 
+    @classmethod
+    def build_from_list(cls, input_list: List, min_degree: int) -> BTree:
+        b_tree = BTree(min_degree)
+        for e in input_list:
+            b_tree.insert(e)
+        return b_tree
+
     def __init__(self, min_degree: int):
         self.degree = min_degree
         self.root = None
@@ -48,13 +55,16 @@ class BTree(object):
         y = node.children[i]
         z.keys = y.keys[self.degree: 2 * self.degree]  # y has 2t - 1 keys
         z.children = y.children[self.degree: 2 * self.degree + 1]  # y has 2t children
-        node.keys.insert(i, y.keys[self.degree])
+        node.keys.insert(i, y.keys[self.degree - 1])
         node.children.insert(i + 1, z)
         # adjust the split node in size
-        y.keys = y.keys[0: self.degree]
-        y.children = y.children[0: self.degree + 1]
+        y.keys = y.keys[0: self.degree - 1]
+        y.children = y.children[0: self.degree]
 
     def insert(self, key: Any) -> None:
+        if not self.root:
+            self.root = BNode([key])
+            return
         r = self.root
         if r.size == 2 * self.degree - 1:
             node = BNode()
@@ -67,7 +77,7 @@ class BTree(object):
 
     def _insert_nonfull(self, node: BNode, key: Any) -> None:
         i = node.size - 1
-        while i > 0 and key < node.keys[i]:
+        while i >= 0 and key < node.keys[i]:
             i -= 1
         if node.is_leaf:
             node.keys.insert(i + 1, key)
@@ -120,10 +130,11 @@ class BTree(object):
                 child_index = 0
             elif key > node.keys[-1]:
                 child_index = node.size
-            for i in range(node.size - 1):
-                if node.keys[i] < key < node.keys[i + 1]:
-                    child_index = i
-                    break
+            else:
+                for i in range(node.size - 1):
+                    if node.keys[i] < key < node.keys[i + 1]:
+                        child_index = i + 1
+                        break
             if (node.children[child_index].size == self.degree - 1 and child_index < node.size
                     and node.children[child_index + 1].size >= self.degree):
                 key_to_move_down_from_node = node.keys.pop(child_index)
@@ -149,3 +160,16 @@ class BTree(object):
                 node.children[child_index].keys.extend(sibling_to_merge.keys)
                 node.children[child_index].children.extend(sibling_to_merge.children)
             self._delete(node.children[child_index], key)
+
+    def inorder_walk(self) -> List[Any]:
+        sorted_keys = []
+        self._recursive_inorder(self.root, sorted_keys)
+        return sorted_keys
+
+    def _recursive_inorder(self, node: BNode, sorted_keys: List[Any]) -> None:
+        for i, key in enumerate(node.keys):
+            if not node.is_leaf:
+                self._recursive_inorder(node.children[i], sorted_keys)
+            sorted_keys.append(key)
+        if not node.is_leaf:
+            self._recursive_inorder(node.children[-1], sorted_keys)
