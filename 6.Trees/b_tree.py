@@ -89,7 +89,10 @@ class BTree(object):
             i = None
         if i is not None and node.is_leaf:
             node.keys.remove(key)
-            return
+            return  # end of recursive delete call ending with removal of some node from the leaf
+        elif i is None and node.is_leaf:
+            raise KeyError(f"No such key to delete {key}.")  # Recursion end for the case when key is not in the tree
+            # and we searched all the way down to the leaf.
         elif i is not None:
             pred_node = node.children[i]
             following_node = node.children[i + 1]
