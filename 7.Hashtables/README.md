@@ -8,7 +8,6 @@ implementations of the hashtable data structure.
 
 Comparison tables of the benchmarking results (run `HashtableComparison.java` to replicate).
 
-
 #### Put operation
 
 |Elements|DoubleHashingHashtable|QuadraticProbingHashtable|SimpleMultiplicativeHashHashtable
@@ -26,8 +25,6 @@ Comparison tables of the benchmarking results (run `HashtableComparison.java` to
 |10000|4.039 ms|3.904 ms|2.665 ms
 |100000|26.69 ms|50.45 ms|26.09 ms
 |1000000|488.3 ms|313.0 ms|586.3 ms
-|10000000|\> 5m|\> 5m
-
 
 #### Get operation
 
