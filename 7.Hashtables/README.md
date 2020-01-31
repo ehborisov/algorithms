@@ -10,7 +10,7 @@ Comparison tables of the benchmarking results (run `HashtableComparison.java` to
 
 #### Put operation
 
-|Elements|DoubleHashingHashtable|QuadraticProbingHashtable|SimpleMultiplicativeHashHashtable
+|Elements|DoubleHashingHashtable|QuadraticProbingHashtable|LinearProbingHashtable
 |:-----:|:-----:|:-----:|:-----:|
 |1000|2.563 ms|1.083 ms|1.697 ms
 |10000|8.027 ms|6.216 ms|3.316 ms
@@ -19,7 +19,7 @@ Comparison tables of the benchmarking results (run `HashtableComparison.java` to
 
 #### Delete operation
 
-|Elements|DoubleHashingHashtable|QuadraticProbingHashtable|SimpleMultiplicativeHashHashtable
+|Elements|DoubleHashingHashtable|QuadraticProbingHashtable|LinearProbingHashtable
 |:-----:|:-----:|:-----:|:-----:|
 |1000|557.0 μs|279.5 μs|427.1 μs
 |10000|4.039 ms|3.904 ms|2.665 ms
@@ -28,7 +28,7 @@ Comparison tables of the benchmarking results (run `HashtableComparison.java` to
 
 #### Get operation
 
-|Elements|DoubleHashingHashtable|QuadraticProbingHashtable|SimpleMultiplicativeHashHashtable
+|Elements|DoubleHashingHashtable|QuadraticProbingHashtable|LinearProbingHashtable
 |:-----:|:-----:|:-----:|:-----:|
 |1000|356.4 μs|189.6 μs|107.7 μs
 |10000|2.350 ms|3.125 ms|1.520 ms
