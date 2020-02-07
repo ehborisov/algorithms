@@ -18,7 +18,7 @@ public abstract class AbstractOpenAddressingHashtable {
 
     private static final int A = (int) ((Math.sqrt(5) - 1)/2 * IntMath.pow(2, 30));
 
-    private Object[] storage;
+    protected Object[] storage;
     int size;
 
     int p;

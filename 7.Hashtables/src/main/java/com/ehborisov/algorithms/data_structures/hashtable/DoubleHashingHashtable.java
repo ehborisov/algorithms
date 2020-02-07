@@ -5,26 +5,20 @@ import org.apache.commons.math3.primes.Primes;
 
 public class DoubleHashingHashtable extends AbstractOpenAddressingHashtable {
 
-    private int prime;
     private Object[] storage;
 
     public DoubleHashingHashtable(int size){
         super(size);
-        this.prime = Primes.nextPrime(size);
-        if(this.prime >= Integer.MAX_VALUE){
-            throw new IllegalArgumentException(
-                    String.format("Cannot initialize hashtable, the desired size is too large %d", size));
-        }
-        this.size = this.prime;
+        this.size = Primes.nextPrime(size); // can't be more than 2^31-1 in any case
         this.storage = new Object[this.size];
     }
 
     private int second_hash(Object key) {
-        return 1 + Math.abs(key.hashCode()) % (this.prime - 1);
+        return 1 + Math.abs(key.hashCode()) % (this.size - 1);
     }
 
     @Override
     int hash(Object key, int i) {
-        return Math.abs(key.hashCode() % this.prime + i * second_hash(key)) % this.prime;
+        return Math.abs(key.hashCode() % this.size + i * second_hash(key)) % this.size;
     }
 }

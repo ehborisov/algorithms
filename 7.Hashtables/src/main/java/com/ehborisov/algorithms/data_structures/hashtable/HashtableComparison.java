@@ -16,7 +16,7 @@ public class HashtableComparison {
         int c1 = random.nextInt(1024);
         int c2 = random.nextInt(1024);
 
-        for(int j = 0; j < 1; j++) {
+        for(int j = 0; j < 4; j++) {
             int size = size_data[j];
             System.out.println(String.format("Add test for DoubleHashingHashtable of size %d", size));
             DoubleHashingHashtable table = new DoubleHashingHashtable(size);
@@ -53,6 +53,18 @@ public class HashtableComparison {
             System.out.println(String.format("Get test for LinearProbingHashtable of size %d", size));
             table3 = new LinearProbingHashtable(size);
             HashtableComparison.getKeys(table3, size, random);
+
+            System.out.println(String.format("Add test for FlatHashtable of size %d", size));
+            LinearProbingHashtable table4 = new FlatHashtable(size);
+            HashtableComparison.addKeys(table4, size, random);
+
+            System.out.println(String.format("Delete test for FlatHashtable of size %d", size));
+            table4 = new FlatHashtable(size);
+            HashtableComparison.deleteKeys(table4, size, random);
+
+            System.out.println(String.format("Get test for FlatHashtable of size %d", size));
+            table4 = new FlatHashtable(size);
+            HashtableComparison.getKeys(table4, size, random);
         }
     }
 
