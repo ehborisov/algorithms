@@ -14,7 +14,7 @@ public class FlatHashtable extends LinearProbingHashtable {
     private int countersSize;
     private int shortestProbe = 0;
     private int longestProbe = 0;
-    private int totalcost = 0;
+    private int totalCost = 0;
     private int m = 0;
 
     public FlatHashtable(int size) {
@@ -22,7 +22,6 @@ public class FlatHashtable extends LinearProbingHashtable {
         this.countersSize = (int) (1.15 * Math.log((double) this.size) + 2.5); // ~ 1.15 ln(n) + 2.5 (see page 56)
         this.counters = new int[this.countersSize];
         this.counters[0] = this.size;
-
     }
 
     public void put(@NotNull Object key) {
@@ -34,7 +33,7 @@ public class FlatHashtable extends LinearProbingHashtable {
         while (k != null && k != SpecialSymbols.DELETED) {
             probePosition++;
             location = this.hash(k, probePosition);
-            this.totalcost++;
+            this.totalCost++;
             recordPosition = Optional.ofNullable(this.findPosition(location)).orElse(0);
             if (probePosition > recordPosition) {
                 Object tmp = this.storage[location];
@@ -58,7 +57,7 @@ public class FlatHashtable extends LinearProbingHashtable {
     }
 
     private Integer findPosition(Object key){
-        int downPosition = (this.m != 0) ? this.totalcost / this.m : 0; // mean position
+        int downPosition = (this.m != 0) ? this.totalCost / this.m : 0; // mean position
         int upPosition = downPosition + 1;
         int downLocation;
         int upLocation;

@@ -20,8 +20,8 @@ public abstract class AbstractOpenAddressingHashtable {
 
     protected Object[] storage;
     int size;
-
     int p;
+
     public AbstractOpenAddressingHashtable(int size) {
         //round it up to the nearest power of 2
         this.p = IntMath.log2(size, RoundingMode.CEILING);
