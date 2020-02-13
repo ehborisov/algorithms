@@ -44,6 +44,53 @@ class ConnectedComponent(object):
         self.vertices = vertices or []
 
 
+class MatrixGraph(object):
+
+    def __init__(self, vertices: List[Vertice] = None, directed=False):
+        self._vertices = vertices or []
+        self._graph = [[None] * len(vertices) for _ in range(len(vertices))] if vertices else []
+        self._directed = directed
+
+    def add_vertice(self, v: Vertice) -> None:
+        self._vertices.append(v)
+        for row in self._graph:
+            row.append(None)
+        self._graph.append([None] * len(self._vertices))
+
+    def add_edge(self, x: Vertice, y: Vertice, weight=1) -> None:
+        if x == y:
+            return
+        x_index = self._vertices.index(x)
+        y_index = self._vertices.index(y)
+        self._graph[x_index][y_index] = weight
+        x.out_degree += 1
+        y.in_degree += 1
+        if not self._directed:
+            self._graph[y_index][y_index] = weight
+
+    def remove_edge(self, x: Vertice, y: Vertice) -> None:
+        x_index = self._vertices.index(x)
+        y_index = self._vertices.index(y)
+        self._graph[x_index][y_index] = None
+        x.out_degree -= 1
+        y.in_degree -= 1
+        if not self._directed:
+            self._graph[y_index][x_index] = None
+
+    def __iter__(self):
+        return iter(self._graph)
+
+    def __getitem__(self, i: int, j: int) -> Optional[Any]:
+        return self._graph[i][j]
+
+    def __str__(self):
+        output_lines = ["  " + "  ".join(str(v.key) for v in self._vertices)]
+        for v, v_list in zip(self._vertices, self._graph):
+            adj_line = [str(v.key) if v else '.' for v in v_list]
+            output_lines.append(f'{v.key} ' + "| ".join(adj_line))
+        return '\n'.join(output_lines) + '\n\n'
+
+
 class AdjacentListGraph(object):
 
     def __init__(self, vertices: Iterable[Vertice] = None, directed=False):
