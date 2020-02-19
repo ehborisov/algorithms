@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Iterable, List, Optional, Dict
+from typing import Any, Iterable, List, Optional, Dict, Tuple
 from enum import Enum
 
 
@@ -41,7 +41,7 @@ class Vertice(object):
 class ConnectedComponent(object):
 
     def __init__(self, vertices: Iterable[Vertice] = None):
-        self.vertices = vertices or []
+        self.vertices = vertices or set()
 
 
 class MatrixGraph(object):
@@ -122,6 +122,18 @@ class AdjacentListGraph(object):
     @property
     def size(self) -> int:
         return len(self._graph)
+
+    @property
+    def vertices(self) -> List[Vertice]:
+        return list(self._graph.keys())
+
+    @property
+    def edges(self) -> Iterable[Tuple[Vertice, Vertice, int]]:
+        if self._directed:
+            return ((x, y, w) for x in self._graph for y, w in self._graph[x].items())
+        else:
+            # dirty hack to get the unique edges, I'm too lazy to invent something better then that here
+            return ((x, y, w) for x in self._graph for y, w in self._graph[x].items() if x.key < y.key)
 
     def add_edge(self, x: Vertice, y: Vertice, weight=1) -> None:
         if x == y:
@@ -204,14 +216,14 @@ def dfs_with_cc_construction(graph: AdjacentListGraph) -> List[ConnectedComponen
         for adj_v in graph[u]:
             if not adj_v.is_visited:
                 adj_v.previous = u
-                component.vertices.append(adj_v)
+                component.vertices.add(adj_v)
                 dfs_visit(adj_v, component)
         u.finalize()
 
     for v in graph:
         if not v.is_visited:
             cc = ConnectedComponent()
-            cc.vertices.append(v)
+            cc.vertices.add(v)
             dfs_visit(v, cc)
             connected_components.append(cc)
     return connected_components
