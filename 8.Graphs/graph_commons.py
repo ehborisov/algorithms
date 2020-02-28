@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Iterable, List, Optional, Dict, Tuple
 from enum import Enum
+from math import inf
+from functools import total_ordering
 
 
 class Color(Enum):
@@ -36,6 +38,36 @@ class Vertice(object):
     @property
     def is_finalized(self) -> bool:
         return self.color == Color.BLACK
+
+
+@total_ordering
+class SPVertice(Vertice):
+
+    def __init__(self, key: Any = None):
+        super().__init__(key)
+        self.shortest_path_estimate = inf
+
+    # this hack with additional ordering by key is needed to make it work with RBTree as TreeSet data structure
+    def __lt__(self, other: SPVertice):
+        if self.shortest_path_estimate != other.shortest_path_estimate:
+            return self.shortest_path_estimate < other.shortest_path_estimate
+        else:
+            return self.key < other.key
+
+    def __gt__(self, other: SPVertice):
+        if self.shortest_path_estimate != other.shortest_path_estimate:
+            return self.shortest_path_estimate > other.shortest_path_estimate
+        else:
+            return self.key > other.key
+
+    def __eq__(self, other):
+        return self is other or self.key == other.key
+
+    def __hash__(self):
+        return hash(self.key)
+
+    def __str__(self):
+        return f"SPVertice key: {self.key} shortest path estimate: {self.shortest_path_estimate}"
 
 
 class ConnectedComponent(object):

@@ -1,3 +1,4 @@
 tox>=2.7.0
 parameterized==0.7.0
 typing_extensions
+bintrees==2.1.0
