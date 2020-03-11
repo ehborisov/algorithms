@@ -40,7 +40,7 @@ def dijkstra_shortest_path(graph: AdjacentListGraph, start: SPVertice, end: SPVe
             while u.previous:
                 u = u.previous
                 shortest_path.append(u)
-            return u.shortest_path_estimate, list(reversed(shortest_path))
+            return end.shortest_path_estimate, list(reversed(shortest_path))
         for adj_v, w in graph[u].items():
             if adj_v in visited:
                 continue
