@@ -7,6 +7,8 @@ from graph_commons import AdjacentListGraph, SPVertice
 
 def dijkstra_shortest_paths(graph: AdjacentListGraph, start: SPVertice):
     visited = set()
+    for v in graph.vertices:
+        v.shortest_path_estimate = inf
     start.shortest_path_estimate = 0
     q = bintrees.RBTree()
     for v in graph.vertices:
@@ -27,6 +29,8 @@ def dijkstra_shortest_paths(graph: AdjacentListGraph, start: SPVertice):
 
 def dijkstra_shortest_path(graph: AdjacentListGraph, start: SPVertice, end: SPVertice) -> Tuple[int, List[SPVertice]]:
     visited = set()
+    for v in graph.vertices:
+        v.shortest_path_estimate = inf
     start.shortest_path_estimate = 0
     q = bintrees.RBTree()
     for v in graph.vertices:

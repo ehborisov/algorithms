@@ -148,6 +148,11 @@ class AdjacentListGraph(object):
                     graph.add_edge(vertices_mapping[keys[i]], vertices_mapping[keys[j]], weights[i][j])
         return graph
 
+    def copy(self):
+        new_graph = AdjacentListGraph(vertices=self.vertices, directed=self._directed)
+        new_graph._graph = self._graph.copy()
+        return new_graph
+
     def add_vertice(self, v: Vertice) -> None:
         self._graph[v] = {}
 
@@ -160,14 +165,14 @@ class AdjacentListGraph(object):
         return list(self._graph.keys())
 
     @property
-    def edges(self) -> Iterable[Tuple[Vertice, Vertice, int]]:
+    def edges(self) -> Iterable[Tuple[Vertice, Vertice, float]]:
         if self._directed:
             return ((x, y, w) for x in self._graph for y, w in self._graph[x].items())
         else:
             # dirty hack to get the unique edges, I'm too lazy to invent something better then that here
             return ((x, y, w) for x in self._graph for y, w in self._graph[x].items() if x.key < y.key)
 
-    def add_edge(self, x: Vertice, y: Vertice, weight=1) -> None:
+    def add_edge(self, x: Vertice, y: Vertice, weight: float=1) -> None:
         if x == y:
             return
         if y in self._graph[x]:
@@ -175,6 +180,15 @@ class AdjacentListGraph(object):
         self._graph[x][y] = weight
         x.out_degree += 1
         y.in_degree += 1
+        if not self._directed:
+            self._graph[y][x] = weight
+
+    def adjust_edge_weight(self, x: Vertice, y: Vertice, weight:float) -> None:
+        if x == y:
+            return
+        if y in self._graph[x]:
+            return
+        self._graph[x][y] = weight
         if not self._directed:
             self._graph[y][x] = weight
 
