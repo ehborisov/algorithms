@@ -57,14 +57,12 @@ def prepare_bad_character_heuristic_table(pattern: str, alphabet: str = ALPHABET
     :return:
     """
     bad_character_table = [[-1] * len(alphabet) for _ in range(len(pattern))]
-    support = [-1] * len(alphabet)
-    charset = set()
+    charset = dict()
     for i in range(len(pattern)):
-        support[alphabet.index(pattern[i])] = i
-        for ch in charset:
+        charset[pattern[i]] = i
+        for ch, leftmost_entry_index in charset.items():
             ch_index = alphabet.index(ch)
-            bad_character_table[i][ch_index] = support[ch_index]
-        charset.add(pattern[i])
+            bad_character_table[i][ch_index] = leftmost_entry_index
     return bad_character_table
 
 
